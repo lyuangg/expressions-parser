@@ -1,0 +1,36 @@
+{
+    "name": "expressions-parser",
+    "version": "1.0.0",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "type": "module",
+    "scripts": {
+        "build": "tsc",
+        "test": "jest"
+    },
+    "files": [
+        "dist",
+        "src"
+    ],
+    "keywords": [
+        "utils",
+        "expressions",
+        "parser"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/lyuangg/expressions-parser.git"
+    },
+    "author": "lyuangg",
+    "license": "ISC",
+    "description": "js 算术表达式解释执行, 支持小括号，加, 减, 乘, 除基本的运算符",
+    "devDependencies": {
+        "@types/jest": "^29.5.12",
+        "@typescript-eslint/eslint-plugin": "^8.5.0",
+        "@typescript-eslint/parser": "^8.5.0",
+        "eslint": "^9.10.0",
+        "jest": "^29.7.0",
+        "ts-jest": "^29.2.5",
+        "typescript": "^5.6.2"
+    }
+}
