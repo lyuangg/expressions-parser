@@ -25,6 +25,12 @@ class ExpressParser {
                     tokens.push(new Token('n', t));
                     t = '';
                 }
+
+                if (t.length <= 0 && element == '-') {
+                    t = element;
+                    continue;
+                }
+
                 if (['+', '-', '*', '/'].indexOf(element) != -1) {
                     tokens.push(new Token('o', element));
                 } else if (['('].indexOf(element) != -1) {

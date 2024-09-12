@@ -28,3 +28,15 @@ test('2*5', () => {
 test('0.1+0.2', () => {
     expect(express.exec('0.1+0.2')).toBe(0.30000000000000004)
 });
+
+test('.1+.2', () => {
+    expect(express.exec('.1+.2')).toBe(0.30000000000000004)
+});
+
+test('-1+2', () => {
+    expect(express.exec('-1+2')).toBe(1)
+});
+
+test('-1+-2', () => {
+    expect(express.exec('-1+-2')).toBe(-3)
+});
