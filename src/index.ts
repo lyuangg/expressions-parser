@@ -43,98 +43,63 @@ class ExpressParser {
     }
 
     syntaxTree(tokens: Token[]): Express | null {
-        let express: Express | null = null;
-        let num1: number | Express | null = null;
-        let num2: number | Express | null = null;
-        let operator: string = '';
-        let noperator: string = '';
+        let stack: any[] = [];
+        let haveFirstOperator: boolean = false;
+        let expressItem: number | Express | string | null = '';
         while (tokens.length > 0) {
-
-            if (num1 == null) {
-                if (tokens[0].tokenType == 'n') {
-                    num1 = Number(tokens[0].tokenVal);
-                    tokens = tokens.slice(1, tokens.length);
-                } else if (tokens[0].tokenType == 'b1') {
-                    let end = this.findRightBracket(tokens);
-                    if (end == 0) {
-                        throw new Error("括号不匹配");
-                    }
-                    num1 = this.syntaxTree(tokens.slice(1, end));
-                    tokens = tokens.slice(end + 1, tokens.length);
-                } else {
-                    throw new Error("语法错误");
+            const item = tokens.shift()
+            if (item?.tokenType == 'b1') {
+                const end = this.findRightBracket(tokens)
+                if (end <= 0) {
+                    throw new Error("括号不匹配")
                 }
+                expressItem = this.syntaxTree(tokens.slice(0, end));
+                tokens = tokens.slice(end + 1, tokens.length);
+            } else if (item?.tokenType == 'o') {
+                expressItem = item.tokenVal;
+                if (item.tokenVal == '*' || item.tokenVal == '/') {
+                    haveFirstOperator = true;
+                } else {
+                    haveFirstOperator = false;
+                }
+            } else if (item?.tokenType == 'n') {
+                expressItem = Number(item.tokenVal);
+            } else {
+                throw new Error("表达式错误");
             }
 
-            if (operator == '') {
-                if (tokens[0].tokenType == 'o') {
-                    operator = tokens[0].tokenVal;
-                    tokens = tokens.slice(1, tokens.length);
-                } else {
-                    throw new Error("语法错误");
-                }
-            }
-
-            if (num2 == null) {
-                if (tokens[0].tokenType == 'n') {
-                    num2 = Number(tokens[0].tokenVal);
-                    tokens = tokens.slice(1, tokens.length);
-                } else if (tokens[0].tokenType == 'b1') {
-                    let end = this.findRightBracket(tokens);
-                    if (end == 0) {
-                        throw new Error("括号不匹配");
-                    }
-                    num2 = this.syntaxTree(tokens.slice(1, end));
-                    tokens = tokens.slice(end + 1, tokens.length);
-                } else {
-                    throw new Error("语法错误");
-                }
-            }
-
-            if (tokens.length > 0) {
-                if (tokens[0].tokenType != 'o') {
-                    throw new Error("语法错误");
-                }
-                noperator = tokens[0].tokenVal;
-                if (this.isFirst(noperator, operator)) {
-                    tokens = tokens.slice(1, tokens.length);
-                    if (tokens.length <= 0) {
-                        throw new Error("语法错误");
-                    }
-                    let nnum: number | Express | null;
-                    if (tokens[0].tokenType == 'n') {
-                        nnum = Number(tokens[0].tokenVal);
-                        tokens = tokens.slice(1, tokens.length);
-                    } else if (tokens[0].tokenType == 'b1') {
-                        let end = this.findRightBracket(tokens);
-                        if (end == 0) {
-                            throw new Error("括号不匹配");
-                        }
-                        nnum = this.syntaxTree(tokens.slice(1, end));
-                        tokens = tokens.slice(end + 1, tokens.length);
-                    } else {
-                        throw new Error("语法错误");
-                    }
-                    num2 = new Express(num2, nnum, noperator);
-                } else {
-                    num1 = new Express(num1, num2, operator);
-                    operator = '';
-                    num2 = null;
-                }
+            stack.push(expressItem);
+            if (stack.length >= 3 && haveFirstOperator && item.tokenType != 'o') {
+                const n2 = stack.pop()
+                const o = stack.pop()
+                const n1 = stack.pop()
+                const newItem = new Express(n1, n2, o);
+                stack.push(newItem);
             }
         }
 
-        if (num1 != null && num2 != null) {
-            express = new Express(num1, num2, operator);
+        let ep: number | Express | null = null;
+        let o: string = '';
+        while (stack.length > 0) {
+            const item = stack.shift();
+            if (typeof item == 'number' || item instanceof Express) {
+                if (ep == null) {
+                    ep = item;
+                } else if (o != '') {
+                    ep = new Express(ep, item, o);
+                    o = '';
+                } else {
+                    throw new Error("语法错误");
+                }
+            } else {
+                o = item;
+            }
         }
 
-        if (express == null && num1 != null && num1 instanceof Express) {
-            return num1;
+        if (ep != null && ep instanceof Express) {
+            return ep;
         }
-        if (express == null && num2 != null && num2 instanceof Express) {
-            return num2;
-        }
-        return express;
+        return null;
     }
 
     isNumeric(str: string): boolean {
@@ -143,7 +108,7 @@ class ExpressParser {
 
     findRightBracket(tokens: Token[]): number {
         let count = 0;
-        for (let i = 1; i < tokens.length; i++) {
+        for (let i = 0; i < tokens.length; i++) {
             if (tokens[i].tokenType == "b2") {
                 if (count == 0) {
                     return i;
@@ -156,15 +121,6 @@ class ExpressParser {
             }
         }
         return 0;
-    }
-
-    isFirst(o1: string, o2: string): boolean {
-        if (o1 == '*' || o1 == '/') {
-            if (o2 == '+' || o2 == '-') {
-                return true;
-            }
-        }
-        return false;
     }
 }
 
