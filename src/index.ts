@@ -24,11 +24,11 @@ class ExpressParser {
                 if (t.length > 0) {
                     tokens.push(new Token('n', t));
                     t = '';
-                }
-
-                if (t.length <= 0 && element == '-') {
-                    t = element;
-                    continue;
+                } else if (t.length <= 0 && element == '-') {
+                    if (tokens.length == 0 || (tokens.length > 0 && tokens[tokens.length - 1].tokenType != 'b2')) {
+                        t = element;
+                        continue;
+                    }
                 }
 
                 if (['+', '-', '*', '/'].indexOf(element) != -1) {
