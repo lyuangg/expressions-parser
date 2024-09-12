@@ -10,7 +10,7 @@ js 算术表达式解释执行。
 
 
 ```bash
-npm i lyuangg-expressions-parser
+npm i @lyuangg/expressions-parser
 ```
 
 ### 使用
