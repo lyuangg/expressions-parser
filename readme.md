@@ -16,7 +16,7 @@ npm i @lyuangg/expressions-parser
 ### 使用
 
 ```js
-import express from "lyuangg-expressions-parser";
+import express from "@lyuangg/expressions-parser";
 
 try {
     console.log(express.exec("1+2+3"))
